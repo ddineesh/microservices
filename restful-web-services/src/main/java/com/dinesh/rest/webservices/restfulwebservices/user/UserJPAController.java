@@ -7,7 +7,11 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,13 +32,18 @@ public class UserJPAController {
 
 	@Autowired
 	private PostRepository postRepository;
+	
+	@Autowired
+	private CacheManager cacheManager;
 
 	@GetMapping(path = "/userList")
+	@Cacheable(value = "User")
 	public List<User> getListOfUsers() {
 		return userRepository.findAll();
 	}
 
 	@GetMapping(path = "/userList/{id}")
+	@Cacheable(value = "User")
 	public Optional<User> findOne(@PathVariable int id) {
 		Optional<User> userFound = userRepository.findById(id);
 		if (!userFound.isPresent()) {
@@ -44,6 +53,7 @@ public class UserJPAController {
 	}
 
 	@PostMapping(path = "/userList")
+	@CacheEvict(value = "employees", allEntries=true)
 	public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
 		User savedUser = userRepository.save(user);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedUser.getId())
@@ -52,35 +62,39 @@ public class UserJPAController {
 	}
 
 	@DeleteMapping(path = "/deleteUser/{id}")
+	@CacheEvict(value = "employees",allEntries = true)
 	public void deleteUser(@PathVariable int id) {
 		userRepository.deleteById(id);
 
 	}
 
-	@GetMapping(path = "/userList/{id}/posts")
-	public List<Post> findUserPosts(@PathVariable int id) {
-		Optional<User> userFound = userRepository.findById(id);
-		if (!userFound.isPresent()) {
-			throw new UserNotFoundException(" Id :=" + id);
-		}
-		return userFound.get().getPosts();
+	@GetMapping(path = "clearCache")
+    @Scheduled(cron = "0 0/30 * * * ?")              // execure after every 30 min
+    public void clearCache(){
+		for(String name:cacheManager.getCacheNames()){
+            cacheManager.getCache(name).clear();            // clear cache by name
+        }
+	
+	/*
+	 * @GetMapping(path = "/userList/{id}/posts") public List<Post>
+	 * findUserPosts(@PathVariable int id) { Optional<User> userFound =
+	 * userRepository.findById(id); if (!userFound.isPresent()) { throw new
+	 * UserNotFoundException(" Id :=" + id); } return userFound.get().getPosts(); }
+	 */
+
+	/*
+	 * @PostMapping(path = "/userList/{id}/posts") public ResponseEntity<Object>
+	 * createPost(@PathVariable int id, @RequestBody Post post) { Optional<User>
+	 * userFound = userRepository.findById(id); if (!userFound.isPresent()) { throw
+	 * new UserNotFoundException(" Id :=" + id); }
+	 * 
+	 * User user = userFound.get();
+	 * 
+	 * post.setUser(user);
+	 * 
+	 * postRepository.save(post); URI location =
+	 * ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand
+	 * (post.getId()) .toUri(); return ResponseEntity.created(location).build(); }
+	 */
 	}
-
-	@PostMapping(path = "/userList/{id}/posts")
-	public ResponseEntity<Object> createPost(@PathVariable int id, @RequestBody Post post) {
-		Optional<User> userFound = userRepository.findById(id);
-		if (!userFound.isPresent()) {
-			throw new UserNotFoundException(" Id :=" + id);
-		}
-
-		User user = userFound.get();
-
-		post.setUser(user);
-
-		postRepository.save(post);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(post.getId())
-				.toUri();
-		return ResponseEntity.created(location).build();
-	}
-
 }

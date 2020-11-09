@@ -39,8 +39,9 @@ public class User {
 	@ApiModelProperty(notes = "Birthdate should be past day")
 	private java.util.Date birthDate;
 
-	@OneToMany(mappedBy = "user")
-	private List<Post> posts;
+	/*
+	 * @OneToMany(mappedBy = "user") private List<Post> posts;
+	 */
 
 	public Integer getId() {
 		return id;
@@ -66,13 +67,11 @@ public class User {
 		this.birthDate = birthDate;
 	}
 
-	public List<Post> getPosts() {
-		return posts;
-	}
-
-	public void setPosts(List<Post> posts) {
-		this.posts = posts;
-	}
+	/*
+	 * public List<Post> getPosts() { return posts; }
+	 * 
+	 * public void setPosts(List<Post> posts) { this.posts = posts; }
+	 */
 
 	@Override
 	public String toString() {

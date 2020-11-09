@@ -2,13 +2,14 @@ package com.dinesh.rest.webservices.restfulwebservices;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @SpringBootApplication
+@EnableCaching
 @Controller
 public class RestfulWebServicesApplication {
 
@@ -22,4 +23,6 @@ public class RestfulWebServicesApplication {
 	{
 		return "Hello World!!!!!";
 	}
+	
+	
 }

@@ -17,10 +17,11 @@ public class Post {
 	private Integer id;
 	private String description;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JsonIgnore
-	private User user;
-
+	/*
+	 * @ManyToOne(fetch = FetchType.LAZY)
+	 * 
+	 * @JsonIgnore private User user;
+	 */
 	public Post() {
 		super();
 	}
@@ -29,7 +30,7 @@ public class Post {
 		super();
 		this.id = id;
 		this.description = description;
-		this.user = user;
+		/* this.user = user; */
 	}
 
 	@Override
@@ -53,12 +54,10 @@ public class Post {
 		this.description = description;
 	}
 
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
+	/*
+	 * public User getUser() { return user; }
+	 * 
+	 * public void setUser(User user) { this.user = user; }
+	 */
 
 }

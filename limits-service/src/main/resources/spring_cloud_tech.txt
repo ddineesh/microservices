@@ -1,0 +1,8 @@
+Eureka- Naming Server
+Ribbon- Cliend side loading balancing
+Spring Config server - Centerlized configuration
+Hystrix- Fault tolerence 
+Netflix API - API gateway
+Zipkin - (Monitoring) distributed tracing
+Rabbit MQ - Distributed MQ
+Feign - Rest ful client generation
