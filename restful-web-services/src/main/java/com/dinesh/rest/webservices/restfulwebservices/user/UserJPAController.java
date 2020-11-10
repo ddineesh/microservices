@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -53,19 +54,31 @@ public class UserJPAController {
 	}
 
 	@PostMapping(path = "/userList")
-	@CacheEvict(value = "employees", allEntries=true)
+	@CacheEvict(value = "User", allEntries=true)
 	public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
 		User savedUser = userRepository.save(user);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedUser.getId())
+		URI location = ServletUriComponentsBuilder.
+				fromCurrentRequest().path("/{id}")
+				.buildAndExpand(savedUser.getId())
 				.toUri();
 		return ResponseEntity.created(location).build();
 	}
 
 	@DeleteMapping(path = "/deleteUser/{id}")
-	@CacheEvict(value = "employees",allEntries = true)
+	@CacheEvict(value = "User",allEntries = true)
 	public void deleteUser(@PathVariable int id) {
 		userRepository.deleteById(id);
 
+	}
+	
+	@PutMapping(path="/updateUser/{userId}")
+	@CacheEvict(value="User", allEntries = true)
+	public ResponseEntity<Object> updateUser(@PathVariable int userId,@RequestBody User user)
+	{
+		User updatedUser=userRepository.save(user);
+		URI location=ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+					.buildAndExpand(updatedUser.getId()).toUri();
+		return ResponseEntity.created(location).build();
 	}
 
 	@GetMapping(path = "clearCache")
