@@ -75,4 +75,10 @@ public class BankAccountDAO {
 		entityManager.persist(account);
 		
 	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = BankTransactionException.class)
+	@CacheEvict(value = "Bank_Account", allEntries = true)
+	public void depositMoney(Long toAccountId, double amount) throws BankTransactionException {
+		addAmount(toAccountId, amount);
+	}
 }

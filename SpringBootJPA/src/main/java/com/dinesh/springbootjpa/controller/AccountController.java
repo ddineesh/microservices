@@ -101,4 +101,30 @@ public class AccountController {
         return "redirect:/";
     }
 	
+    @RequestMapping(value = "/depositAmount", method = RequestMethod.GET)
+    public String viewDepositMoneyPage(Model model) {
+ 
+        SendMoneyForm form = new SendMoneyForm(1L,1L, 50d);
+ 
+        model.addAttribute("sendMoneyForm", form);
+        List<BankAccountInfo> list = bankAccountDAO.listBankAccountInfo();
+        model.addAttribute("accountInfos", list);
+        return "depositMoneyPage";
+    }
+    
+    
+    @RequestMapping(value = "/depositAmount", method = RequestMethod.POST)
+    public String processDepositMoney(Model model, SendMoneyForm sendMoneyForm) {
+ 
+        System.out.println("Money Deposited: " + sendMoneyForm.getAmount());
+        System.out.println("Accoun Id: " + sendMoneyForm.getFromAccountId());
+
+        try {
+            bankAccountDAO.depositMoney(sendMoneyForm.getToAccountId(), sendMoneyForm.getAmount());
+        } catch (BankTransactionException e) {
+            model.addAttribute("errorMessage", "Error: " + e.getMessage());
+            return "/createAccount";
+        }
+        return "redirect:/";
+    }
 }
